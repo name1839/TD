@@ -1,0 +1,40 @@
+# Cascade R-CNN with ResNet-50 FPN for Triplet Detection
+_BASE_: ["../Base-RCNN-FPN.yaml", "Base-Triplet.yaml"]
+
+MODEL:
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 50
+  
+  # Cascade R-CNN specific configuration
+  ROI_HEADS:
+    NAME: "CascadeROIHeads"
+    BATCH_SIZE_PER_IMAGE: 256
+    POSITIVE_FRACTION: 0.25
+    SCORE_THRESH_TEST: 0.3     # Lower threshold for surgical tools
+    NMS_THRESH_TEST: 0.4       # Tighter NMS for overlapping tools
+  
+  # Box head configuration for cascade stages
+  ROI_BOX_HEAD:
+    NAME: "FastRCNNConvFCHead"
+    NUM_FC: 2
+    POOLER_RESOLUTION: 7
+    CLS_AGNOSTIC_BBOX_REG: True  # Required for Cascade R-CNN
+  
+  # Cascade-specific settings
+  ROI_BOX_CASCADE_HEAD:
+    BBOX_REG_WEIGHTS: [[10.0, 10.0, 5.0, 5.0], [20.0, 20.0, 10.0, 10.0], [30.0, 30.0, 15.0, 15.0]]
+    IOUS: [0.5, 0.6, 0.7]  # IoU thresholds for each cascade stage
+  
+  # RPN configuration
+  RPN:
+    PRE_NMS_TOPK_TRAIN: 2000
+    PRE_NMS_TOPK_TEST: 1000
+    POST_NMS_TOPK_TRAIN: 2000  # Higher for cascade
+    POST_NMS_TOPK_TEST: 1000
+  
+  # Fine-tune anchor settings for surgical tools
+  ANCHOR_GENERATOR:
+    SIZES: [[16], [32], [64], [128], [256]]  # Smaller anchors for precise tools
+    ASPECT_RATIOS: [[0.5, 1.0, 2.0]]

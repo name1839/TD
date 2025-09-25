@@ -1,0 +1,27 @@
+# Faster R-CNN with ResNet-50 FPN for Triplet Detection
+_BASE_: ["../Base-RCNN-FPN.yaml", "Base-Triplet.yaml"]
+
+MODEL:
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 50
+  
+  # Fine-tune anchor settings for surgical tools
+  ANCHOR_GENERATOR:
+    SIZES: [[16], [32], [64], [128], [256]]  # Smaller anchors for precise tools
+    ASPECT_RATIOS: [[0.5, 1.0, 2.0]]
+  
+  # ROI Head configuration for triplet detection
+  ROI_HEADS:
+    BATCH_SIZE_PER_IMAGE: 256  # Reduce for memory efficiency
+    POSITIVE_FRACTION: 0.25
+    SCORE_THRESH_TEST: 0.3     # Lower threshold for surgical tools
+    NMS_THRESH_TEST: 0.4       # Tighter NMS for overlapping tools
+  
+  # RPN configuration
+  RPN:
+    PRE_NMS_TOPK_TRAIN: 2000
+    PRE_NMS_TOPK_TEST: 1000
+    POST_NMS_TOPK_TRAIN: 1000
+    POST_NMS_TOPK_TEST: 1000

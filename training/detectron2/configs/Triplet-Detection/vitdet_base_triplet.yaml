@@ -1,0 +1,67 @@
+# ViT-Det Base for Triplet Detection
+# Note: This is a simplified YAML version. For full ViT-Det functionality,
+# consider using the Python config format in projects/ViTDet/
+
+_BASE_: ["Base-Triplet.yaml"]
+
+MODEL:
+  META_ARCHITECTURE: "GeneralizedRCNN"
+  
+  # ViT backbone configuration (simplified)
+  BACKBONE:
+    NAME: "build_resnet_fpn_backbone"  # Fallback to ResNet-FPN for YAML compatibility
+  
+  # Use ResNet-50 as backbone (ViT-Det requires Python config for full functionality)
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+  RESNETS:
+    DEPTH: 50
+    OUT_FEATURES: ["res2", "res3", "res4", "res5"]
+  
+  # FPN configuration
+  FPN:
+    IN_FEATURES: ["res2", "res3", "res4", "res5"]
+    OUT_CHANNELS: 256
+  
+  # RPN configuration
+  RPN:
+    IN_FEATURES: ["p2", "p3", "p4", "p5", "p6"]
+    PRE_NMS_TOPK_TRAIN: 2000
+    PRE_NMS_TOPK_TEST: 1000
+    POST_NMS_TOPK_TRAIN: 1000
+    POST_NMS_TOPK_TEST: 1000
+  
+  # ROI Heads configuration
+  ROI_HEADS:
+    NAME: "StandardROIHeads"
+    IN_FEATURES: ["p2", "p3", "p4", "p5"]
+    BATCH_SIZE_PER_IMAGE: 256
+    POSITIVE_FRACTION: 0.25
+    SCORE_THRESH_TEST: 0.3
+    NMS_THRESH_TEST: 0.4
+  
+  # Box head configuration
+  ROI_BOX_HEAD:
+    NAME: "FastRCNNConvFCHead"
+    NUM_FC: 2
+    POOLER_RESOLUTION: 7
+  
+  # Anchor configuration optimized for surgical tools
+  ANCHOR_GENERATOR:
+    SIZES: [[16], [32], [64], [128], [256]]
+    ASPECT_RATIOS: [[0.5, 1.0, 2.0]]
+
+# Enhanced solver for ViT-style training
+SOLVER:
+  IMS_PER_BATCH: 4      # Smaller batch for memory efficiency
+  BASE_LR: 0.0001       # Lower learning rate for ViT-style training
+  STEPS: (50000, 70000)
+  MAX_ITER: 80000
+  WARMUP_ITERS: 2000    # Longer warmup
+  WARMUP_FACTOR: 0.001
+  GAMMA: 0.1
+  WEIGHT_DECAY: 0.05    # Higher weight decay
+  MOMENTUM: 0.9
+
+# Note: For true ViT-Det functionality, use:
+# projects/ViTDet/configs/COCO/mask_rcnn_vitdet_b_100ep.py
+# and adapt it for your triplet dataset

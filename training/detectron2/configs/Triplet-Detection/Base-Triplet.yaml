@@ -1,0 +1,49 @@
+# Base configuration for Triplet Dataset (Tool-Action-Target Detection)
+# This file contains common settings that can be inherited by specific model configs
+
+# Dataset configuration
+DATASETS:
+  TRAIN: ("triplet_split1_train",)
+  TEST: ("triplet_split1_val",)
+
+# Number of classes (89 triplet combinations)
+MODEL:
+  ROI_HEADS:
+    NUM_CLASSES: 89
+  RETINANET:
+    NUM_CLASSES: 89
+
+# Solver configuration optimized for surgical tool detection
+SOLVER:
+  IMS_PER_BATCH: 8  # Reduce batch size for high-resolution surgical images
+  BASE_LR: 0.01     # Conservative learning rate for fine-grained detection
+  STEPS: (40000, 60000)  # Learning rate decay steps
+  MAX_ITER: 80000   # Total training iterations
+  WARMUP_ITERS: 1000
+  WARMUP_FACTOR: 0.1
+  GAMMA: 0.1        # Learning rate decay factor
+  WEIGHT_DECAY: 0.0001
+  MOMENTUM: 0.9
+
+# Input configuration for surgical images
+INPUT:
+  MIN_SIZE_TRAIN: (480, 512, 544, 576, 608, 640)  # Multi-scale training
+  MAX_SIZE_TRAIN: 800
+  MIN_SIZE_TEST: 640
+  MAX_SIZE_TEST: 800
+  FORMAT: "BGR"     # Standard format for detectron2
+
+# Data loader configuration
+DATALOADER:
+  NUM_WORKERS: 4    # Adjust based on your system
+  FILTER_EMPTY_ANNOTATIONS: True
+
+# Evaluation configuration
+TEST:
+  EVAL_PERIOD: 5000  # Evaluate every 5000 iterations
+  DETECTIONS_PER_IMAGE: 100  # Max detections per image
+
+# Output directory
+OUTPUT_DIR: "./output/triplet_detection"
+
+VERSION: 2

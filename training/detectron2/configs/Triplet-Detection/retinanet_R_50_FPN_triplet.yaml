@@ -1,0 +1,24 @@
+# RetinaNet with ResNet-50 FPN for Triplet Detection
+_BASE_: ["../Base-RetinaNet.yaml", "Base-Triplet.yaml"]
+
+MODEL:
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+  RESNETS:
+    DEPTH: 50
+  
+  # RetinaNet specific configuration for surgical tools
+  RETINANET:
+    IOU_THRESHOLDS: [0.4, 0.5]
+    IOU_LABELS: [0, -1, 1]
+    SMOOTH_L1_LOSS_BETA: 0.0
+    FOCAL_LOSS_ALPHA: 0.25
+    FOCAL_LOSS_GAMMA: 2.0
+    PRIOR_PROB: 0.01
+    SCORE_THRESH_TEST: 0.3     # Lower threshold for surgical tools
+    TOPK_CANDIDATES_TEST: 1000
+    NMS_THRESH_TEST: 0.4       # Tighter NMS for overlapping tools
+  
+  # Anchor configuration optimized for surgical tools
+  ANCHOR_GENERATOR:
+    SIZES: [[16, 20, 25], [32, 40, 50], [64, 80, 101], [128, 161, 203], [256, 322, 406]]
+    ASPECT_RATIOS: [[0.5, 1.0, 2.0]]

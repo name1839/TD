@@ -1,0 +1,12 @@
+# VITDET for Triplet Detection - SPLIT5
+# Auto-generated configuration file
+
+_BASE_: ["../vitdet_base_triplet.yaml"]
+
+# Dataset configuration for split5
+DATASETS:
+  TRAIN: ("triplet_split5_train",)
+  TEST: ("triplet_split5_val",)
+
+# Output directory for this split
+OUTPUT_DIR: "./output/triplet_vitdet_split5"

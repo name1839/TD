@@ -1,0 +1,12 @@
+# CASCADE_RCNN for Triplet Detection - SPLIT1
+# Auto-generated configuration file
+
+_BASE_: ["../cascade_rcnn_R_50_FPN_triplet.yaml"]
+
+# Dataset configuration for split1
+DATASETS:
+  TRAIN: ("triplet_split1_train",)
+  TEST: ("triplet_split1_val",)
+
+# Output directory for this split
+OUTPUT_DIR: "./output/triplet_cascade_rcnn_split1"
